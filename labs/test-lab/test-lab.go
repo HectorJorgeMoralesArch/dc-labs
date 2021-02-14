@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 )
 
 func main() {
-	fmt.Println("Welcome to the jungle")
+	fmt.Println("Hello " + os.Args[1] + ", Welcome to the Jungle")
 }
