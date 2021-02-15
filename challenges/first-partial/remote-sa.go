@@ -4,43 +4,62 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
 )
-
+//Struct for a Point
 type Point struct {
-	X, Y float64
+	x, y float64
 }
-//Get the X parameter of a Point
+//Return the X value of the Point
 func (p *Point) X() float64 {
 	return p.x
 }
-
-//Get the Y parameter of a Point
+//Return the Y value of the Point
 func (p *Point) Y() float64 {
 	return p.y
 }
 // traditional function
-func Distance(p, q Point) float64 {
+func getDistance(p, q Point) float64 {
 	return math.Hypot(q.X()-p.X(), q.Y()-p.Y())
 }
 
 // same thing, but as a method of the Point type
-func (p Point) Distance(q Point) float64 {
+func (p Point) getDistance(q Point) float64 {
 	return math.Hypot(q.X()-p.X(), q.Y()-p.Y())
+}
+//Struct for a Vector
+type Vector struct {
+	x, y float64
+}
+//Return the X value of the Point
+func (v *Vector) X() float64 {
+	return v.x
+}
+//Return the Y value of the Point
+func (v *Vector) Y() float64 {
+	return v.y
+}
+//Point Method that transforms two points into a single vector
+func (a Point) toVector(b Point) Vector{
+	return Vector{(b.X() - a.X()), (b.Y() - a.Y())}
+}
+//Vector Method that gets the cross product between two Vectors 2X2
+func (a Vector) cross(b Vector) float64 {
+	return a.X() * b.Y() - a.Y() * b.X()
 }
 func main() {
 	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+	log.Fatal(http.ListenAndServe("localhost:8005", nil))
 }
 
 //generatePoints array
 func generatePoints(s string) ([]Point, error) {
 
 	points := []Point{}
-
+	
+	s = strings.Replace(s, " ", "", -1)
 	s = strings.Replace(s, "(", "", -1)
 	s = strings.Replace(s, ")", "", -1)
 	vals := strings.Split(s, ",")
@@ -61,17 +80,62 @@ func generatePoints(s string) ([]Point, error) {
 	}
 	return points, nil
 }
-
-// getArea gets the area inside from a given shape
-func getArea(points []Point) float64 {
-	// Your code goes here
-	return 0.0
+//Function that checks if two vectors are on the same segment
+func onSegment(p, q, r Point) bool {
+	if q.X() <= math.Max(p.X(), r.X()) && q.X() >= math.Min(p.X(), r.X()) && q.Y() <= math.Max(p.Y(), r.Y()) && q.Y() >= math.Min(p.Y(), r.Y()) {
+		return true
+	}
+	return false
 }
+//Checks the orientation of vector 0 = Collinear, 1 = CCW, 2 = CW
+func orientation(p, q, r Point) int {
+	var val float64 = (q.Y()-p.Y())*(r.X()-q.X()) - (q.X()-p.X())*(r.Y()-q.Y())
+	switch {
+	case val == 0:
+		return 0
+	case val > 0:
+		return 1
+	default:
+		return 2
+	}
+}
+//Checks if 4 points intersects
+func doIntersect(p1, q1, p2, q2 Point) bool {
+	var o1, o2, o3, o4 int = orientation(p1, q1, p2), orientation(p1, q1, q2), orientation(p2, q2, p1), orientation(p2, q2, q1)
+	if o1 != o2 && o3 != o4 {
+		return true
+	}
+	if o1 == 0 && onSegment(p1, p2, q1) {
+		return true
+	}
+	if o2 == 0 && onSegment(p1, q2, q1) {
+		return true
+	}
+	if o3 == 0 && onSegment(p2, p1, q2) {
+		return true
+	}
+	if o4 == 0 && onSegment(p2, q1, q2) {
+		return true
+	}
+	return false
 
+}
+// getArea gets the area inside from a given shape
+func getArea(p []Point) float64 {
+	var a float64
+	for i := 0; i < len(p); i++ {
+		j := (i + 1) % len(p)
+		a+=(p[i].X() * p[j].Y()) - (p[j].X() * p[i].Y())
+	}
+	return math.Abs(a/2.0)
+}
 // getPerimeter gets the perimeter from a given array of connected points
-func getPerimeter(points []Point) float64 {
-	// Your code goes here
-	return 0.0
+func getPerimeter(p []Point) float64 {
+	var per float64
+	for i := 0; i < len(p); i++ {
+		per += getDistance(p[i], p[(i + 1) % len(p)])
+	}
+	return per
 }
 
 // handler handles the web request and reponds it
@@ -89,7 +153,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-
 	// Results gathering
 	area := getArea(vertices)
 	perimeter := getPerimeter(vertices)

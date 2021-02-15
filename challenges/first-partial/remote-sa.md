@@ -32,7 +32,7 @@ $ make serve
 - **Terminal 2 - Client**
 ```
 # Working example
-$ curl http://localhost:8000\?vertices\=\(-3,\1),\(2,3\),\(0,0\),\(-1.5,-2.5\)
+$ curl http://localhost:8001\?vertices\=\(-3,\1),\(2,3\),\(0,0\),\(-1.5,-2.5\)
 Welcome to the Remote Shapes Analyzer
 - Your figure has      : [4] vertices
 - Vertices             : (-3,1) (2,3) (0,0) (-1.5, -2.5)
@@ -40,7 +40,7 @@ Welcome to the Remote Shapes Analyzer
 - Calculated Area      : 10.5
 
 # Error handling example
-$ curl http://localhost:8000\?vertices=\(-3,1\)\(2,3\)
+$ curl http://localhost:8001\?vertices=\(-3,1\)\(2,3\)
 Welcome to the Remote Shapes Analyzer
 - Your figure has      : [2] vertices
 ERROR - Your shape is not compliying with the minimum number of vertices.
