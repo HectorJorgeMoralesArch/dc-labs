@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,7 +13,15 @@ import (
 type Point struct {
 	X, Y float64
 }
+//Get the X parameter of a Point
+func (p *Point) X() float64 {
+	return p.x
+}
 
+//Get the Y parameter of a Point
+func (p *Point) Y() float64 {
+	return p.y
+}
 func main() {
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
