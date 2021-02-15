@@ -22,6 +22,15 @@ func (p *Point) X() float64 {
 func (p *Point) Y() float64 {
 	return p.y
 }
+// traditional function
+func Distance(p, q Point) float64 {
+	return math.Hypot(q.X()-p.X(), q.Y()-p.Y())
+}
+
+// same thing, but as a method of the Point type
+func (p Point) Distance(q Point) float64 {
+	return math.Hypot(q.X()-p.X(), q.Y()-p.Y())
+}
 func main() {
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe("localhost:8000", nil))
