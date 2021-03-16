@@ -2,23 +2,16 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
+	"flag"
 	"log"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 )
 //General Data Structure
-type GenData struct {
+type Data struct {
 	BName string
-	Objs map[string]bool
-	Dirs map[string]bool
-	Exts map[string]int
-}
-//Specific Data Structure
-type GenData struct {
-	DirName string
 	Objs map[string]bool
 	Dirs map[string]bool
 	Exts map[string]int
@@ -33,11 +26,10 @@ type ListBucket struct {
 	XMLName  xml.Name  `xml:"ListBucketResult"`
 	Contents []Content `xml:"Contents"`
 }
-func search(w http.ResponseWriter, r *http.Request)
-{
-	searchedData := Data{Bname: r.FormValue(BName), Dirs: make(map[string]bool), Objs: make(map[string]bool), Exts: make(map[string]int)}
+func search(w http.ResponseWriter, r *http.Request){
+	searchedData := Data{BName: r.FormValue(BName), Dirs: make(map[string]bool), Objs: make(map[string]bool), Exts: make(map[string]int)}
 	dir:=r.FormValue(Dir)
-	hasDir=false
+	hasDir:=false
 	if dir!=""{
 		hasDir=true
 	}
@@ -61,18 +53,17 @@ func search(w http.ResponseWriter, r *http.Request)
 			continue
 		}
 		if strings.Contains(key, ".") {
-			if _, exists := searchedData.Objects[key]; !exists {
-				searchedData.Objects[key] = true
+			if _, exists := searchedData.Objs[key]; !exists {
+				searchedData.Objs[key] = true
 			}
 			container := strings.Split(key, ".")
 			ext := container[len(container)-1]
-			_, exists := searchedData.Extentions[ext]
+			_, exists := searchedData.Exts[ext]
 			if !exists {
-				searchedData.Extentions[ext] = 0
-				searchedData.Extentions[ext]++
-			}
-			else {
-				searchedData.Extentions[ext]++
+				searchedData.Exts[ext] = 0
+				searchedData.Exts[ext]++
+			}else {
+				searchedData.Exts[ext]++
 			}
 		}
 		if strings.HasSuffix(key, "/") {
@@ -86,8 +77,7 @@ func search(w http.ResponseWriter, r *http.Request)
 func print(data Data, dir bool) {
 	if dir{
 		fmt.Println("AWS S3 Explorer\nBucket Name\t\t: " + data.BName)
-	}
-	else{
+	}else{
 
 		fmt.Println("AWS S3 Explorer\nDirectory Name\t\t: " + data.BName)
 	}
@@ -101,11 +91,10 @@ func main() {
 	flag.Parse()
 	s := fmt.Sprintf("localhost:%v", *p)
 	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 		search(w, r)
     })
 	
-	err := http.ListenAndServe(socket, nil)
+	err := http.ListenAndServe(s, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
