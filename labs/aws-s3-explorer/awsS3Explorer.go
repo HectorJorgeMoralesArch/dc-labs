@@ -16,13 +16,6 @@ type GenData struct {
 	Dirs map[string]bool
 	Exts map[string]int
 }
-//Specific Data Structure
-type GenData struct {
-	SName string
-	Objs map[string]bool
-	Dirs map[string]bool
-	Exts map[string]int
-}
 //Content
 type Content struct {
 	Key string `xml:"Key"`
@@ -36,14 +29,46 @@ type ListBucket struct {
 func search(w http.ResponseWriter, r *http.Request)
 {
 	max:=5
-	exts := make(map[string]int)
-	dirs := make(map[string]bool)
-	objs := make(map[string]bool)
-	
-	resp, err := http.Get(fmt.Sprintf("https://%v.s3.amazonaws.com", r.FormValue(BName)))
-	if err!=""{
-		log.Fatalln(err)
+	searchedData := Data{Bname: r.FormValue(BName), Dirs: make(map[string]bool), Objs: make(map[string]bool), Exts: make(map[string]int)}
+
+	/* Get XML from URL */
+	resp, err := http.Get("https://" + searchedData.BName + ".s3.amazonaws.com")
+	if err != nil {
+		log.Panicln("Get: " + err.Error())
 	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Panicln("Read body: " + err.Error())
+	}
+	/* Process XML Response into an object */
+	var ListBucket ListBucket
+	xml.Unmarshal(data, &ListBucket)
+	/* Process Object Data */
+	for _, Content := range ListBucket.Contents {
+		key := Content.Key
+		if strings.Contains(key, ".") {
+			if _, exists := searchedData.Objects[key]; !exists {
+				searchedData.Objects[key] = true
+			}
+			container := strings.Split(key, ".")
+			ext := container[len(container)-1]
+			_, exists := searchedData.Extentions[ext]
+			if !exists {
+				searchedData.Extentions[ext] = 0
+				searchedData.Extentions[ext]++
+			}
+			else {
+				searchedData.Extentions[ext]++
+			}
+		}
+		if strings.HasSuffix(key, "/") {
+			if !searchedData.Dirs[key] {
+				searchedData.Dirs[key] = true
+			}
+		}
+	}
+	print(searchedData)
 }
 func main() {
 	var p = flag.Int("port", 9876, "Port")
