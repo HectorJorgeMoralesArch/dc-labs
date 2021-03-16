@@ -1,5 +1,4 @@
 package main
-
 import (
 	"bufio"
 	"log"
@@ -7,9 +6,7 @@ import (
 	"net/http"
 	"flag"
 )
-
 func main() {
-
 	var P = flag.String("proxy", "localhost:9876", "Proxy")
 	var BName = flag.String("bucket", "", "Bucket Name")
 	var Dir = flag.String("directory", "", "Directory")
@@ -22,7 +19,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	
 	S := bufio.NewScanner(resp.Body)
 	for i := 0; S.Scan(); i++ {
 		log.Println(S.Text())

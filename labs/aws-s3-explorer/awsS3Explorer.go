@@ -20,7 +20,6 @@ type Data struct {
 type Content struct {
 	Key string `xml:"Key"`
 }
-
 //ListBucket
 type ListBucket struct {
 	XMLName  xml.Name  `xml:"ListBucketResult"`
