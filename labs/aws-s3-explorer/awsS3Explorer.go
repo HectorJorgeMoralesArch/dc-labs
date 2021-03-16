@@ -16,6 +16,13 @@ type GenData struct {
 	Dirs map[string]bool
 	Exts map[string]int
 }
+//Specific Data Structure
+type GenData struct {
+	DirName string
+	Objs map[string]bool
+	Dirs map[string]bool
+	Exts map[string]int
+}
 //Content
 type Content struct {
 	Key string `xml:"Key"`
@@ -28,9 +35,12 @@ type ListBucket struct {
 }
 func search(w http.ResponseWriter, r *http.Request)
 {
-	max:=5
 	searchedData := Data{Bname: r.FormValue(BName), Dirs: make(map[string]bool), Objs: make(map[string]bool), Exts: make(map[string]int)}
-
+	dir:=r.FormValue(Dir)
+	hasDir=false
+	if dir!=""{
+		hasDir=true
+	}
 	/* Get XML from URL */
 	resp, err := http.Get("https://" + searchedData.BName + ".s3.amazonaws.com")
 	if err != nil {
@@ -47,6 +57,9 @@ func search(w http.ResponseWriter, r *http.Request)
 	/* Process Object Data */
 	for _, Content := range ListBucket.Contents {
 		key := Content.Key
+		if hasDir == true && !strings.HasPrefix(key, dir){
+			continue
+		}
 		if strings.Contains(key, ".") {
 			if _, exists := searchedData.Objects[key]; !exists {
 				searchedData.Objects[key] = true
@@ -68,7 +81,20 @@ func search(w http.ResponseWriter, r *http.Request)
 			}
 		}
 	}
-	print(searchedData)
+	print(searchedData,hasDir)
+}
+func print(data Data, dir bool) {
+	if dir{
+		fmt.Println("AWS S3 Explorer\nBucket Name\t\t: " + data.BName)
+	}
+	else{
+
+		fmt.Println("AWS S3 Explorer\nDirectory Name\t\t: " + data.BName)
+	}
+	fmt.Println("Number of objects\t: " + strconv.Itoa(len(data.Objs))+"\nNumber of directories\t: " + strconv.Itoa(len(data.Dirs))+"\nExtensions\t\t: ")
+	for key, value := range data.Exts {
+		fmt.Print(key + "(" + strconv.Itoa(value) + ")\n")
+	}
 }
 func main() {
 	var p = flag.Int("port", 9876, "Port")
