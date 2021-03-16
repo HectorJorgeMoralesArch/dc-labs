@@ -4,15 +4,14 @@ import (
 	"bufio"
 	"log"
 	"fmt"
-	"os"
 	"net/http"
 	"flag"
 )
 
 func main() {
 
-	var P = flag.String("proxy", "localhost:9543", "Proxy")
-	var BName = flag.String("bucket", "", "Bucket name")
+	var P = flag.String("proxy", "localhost:9876", "Proxy")
+	var BName = flag.String("bucket", "", "Bucket Name")
 	var Dir = flag.String("directory", "", "Directory")
 	flag.Parse()
 	if *BName == "" {

@@ -27,8 +27,8 @@ type ListBucket struct {
 	Contents []Content `xml:"Contents"`
 }
 func search(w http.ResponseWriter, r *http.Request){
-	searchedData := Data{BName: r.FormValue(BName), Dirs: make(map[string]bool), Objs: make(map[string]bool), Exts: make(map[string]int)}
-	dir:=r.FormValue(Dir)
+	searchedData := Data{BName: r.FormValue("bucket"), Dirs: make(map[string]bool), Objs: make(map[string]bool), Exts: make(map[string]int)}
+	dir:=r.FormValue("directory")
 	hasDir:=false
 	if dir!=""{
 		hasDir=true
