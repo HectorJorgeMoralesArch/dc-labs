@@ -1,9 +1,6 @@
 User Guide
 ==========
->! Created by
->! Hector Jorge Morales Arch as JarlArchJernRauda
->! and Juan Pablo as PuPumPa
-
+<!-- Created by Hector Jorge Morales Arch as JarlArchJernRauda and Juan Pablo as PuPumPa-->
 ## Requirements
 
 - Hove installed Goland 
