@@ -7,7 +7,7 @@ import (
 	"flag"
 )
 func main() {
-	var P = flag.String("proxy", "localhost:9876", "Proxy")
+	var P = flag.String("proxy", "localhost:9765", "Proxy")
 	var BName = flag.String("bucket", "", "Bucket Name")
 	var Dir = flag.String("directory", "", "Directory")
 	flag.Parse()

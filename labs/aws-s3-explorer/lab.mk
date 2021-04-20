@@ -5,7 +5,7 @@ CLIENT_APP=awsS3Client
 
 proxy:
 	@echo Start AWS S3 Explorer Proxy
-	go run ./${PROXY_APP}.go -port 8000
+	go run ./${PROXY_APP}.go -port 9765
 test:
 	@echo Test 1 - only bucket case
 	go run ./${CLIENT_APP}.go -bucket ryft-public-sample-data
